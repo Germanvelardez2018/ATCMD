@@ -66,6 +66,9 @@ class Serial_AT(ICMD):
 
     
     def init_interface(self,*arg):
+        """"
+        Config and init  hardware interface. It uses a menu with the opctions
+        """
         print("init interface")
         
   
@@ -98,6 +101,18 @@ class Serial_AT(ICMD):
 
 
     
+    def _send_cmd_and_check(self,cmd,expected_response,timeout=1):
+
+        buffer_rx = self._send_cmd(cmd,timeout=timeout)
+
+        ok = False
+        for line in buffer_rx:
+            if str(line).count(expected_response) >0:    ## the response contain the excepted response
+                ok = True
+                break
+        return ok
+
+
     def _send_cmd(self,cmd,timeout=1):
         """
         Send a commnad by the interface and return buffer_rx
@@ -112,18 +127,19 @@ class Serial_AT(ICMD):
                 w = s.write(bytes(commands,"utf-8"))
                 self._debug_print(commands,device_name=self._device_name)
 
-                res = ""
+                rx_buffer=[]
                 lines = s.readlines()
                 for line in lines :
                     line_formated = (str(line).replace("b",""))
                     self._debug_print(line_formated,output=False,device_name=self._device_name)
-                    res += line_formated
+                    rx_buffer.append(line_formated) 
 
-            return res # return all buffer rx
+            return rx_buffer # return all buffer rx
 
         except SerialException:
             self._debug_print("Serial Interface Error",device_name=self._device_name)
-
+        except SerialTimeoutException:
+            self._debug_print("device not respond",device_name=self._device_name)
         
       
 
@@ -137,10 +153,25 @@ class Serial_AT(ICMD):
 
 
       
-    
+   
+        
+
+
+
+
+
+
+
+
+# PRIVATE FUNCTIONS
+
+
+ 
     def _debug_print(self,message,output=True,device_name=""):
 
-        
+        """
+        Output for debug. Maybe it can save information in a file
+        """
         if self._debug == True:
             if output == True:
             
@@ -150,14 +181,6 @@ class Serial_AT(ICMD):
 
             print("[{}] {} {}".format(device_name,o,message))
             
-        
-
-
-
-# PRIVATE FUNCTIONS
-
-
-
 
 
 
@@ -196,6 +219,9 @@ class Serial_AT(ICMD):
         self._debug_print("-"*50,device_name="PyInterface")
         return option_select
  
+
+
+
 
     def _read_ports(self):
             """
@@ -238,6 +264,12 @@ if __name__ == "__main__":
 
     print("init program")
     s = Serial_AT()
-    s._send_cmd("")
+    res = s._send_cmd_and_check("z","OK",1)
+
+    if res == True:
+        print("expected response")
+
+    else:
+        print("without unexpected response")
     
 
