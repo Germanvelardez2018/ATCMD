@@ -56,3 +56,7 @@ class ICMD(ABC):
     @abstractclassmethod
     def _debug_print(self,message):
         pass
+
+    @abstractclassmethod
+    def _debug_print(self,message,output=True,device_name=""):
+        pass

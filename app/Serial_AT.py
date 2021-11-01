@@ -30,7 +30,7 @@ class Serial_AT(ICMD):
     _device_name= "Device"
     _debug = True
 
-    def __init__(self,pre_cmd="AT",pos_cmd= "\r\n"):
+    def __init__(self,pre_cmd="",pos_cmd= ""):
       super().set_pre_cmd(pre_cmd)
       super().set_pos_cmd(pos_cmd)
       self.init_interface()   
@@ -71,33 +71,28 @@ class Serial_AT(ICMD):
         """
         print("init interface")
         
-  
-        
         
         print("read ports")
         port_list = self._read_ports() #reading the serial ports
 
-        print("select ports.port list {}".format(port_list))
         port_selected = self._select_option(port_list,"List of serial ports","Select a serial port")
-       #if port_selected == 0:
-        #     raise Exception
-
-           #if OK. set port
-        self._set_serial_port(port_list[port_selected-1])
-
-
-        baudrate_selected = self._select_option(self._BAUDRATE_LIST,"List of Baudrates valide","Select a baudrate")
-
-        self._set_serial_baudrate(self._BAUDRATE_LIST[baudrate_selected-1])
+        if port_selected == 0:
+             raise Exception
         
-        """
+        try:
+            self._set_serial_port(port_list[port_selected-1])
 
+
+            baudrate_selected = self._select_option(self._BAUDRATE_LIST,"List of Baudrates valide","Select a baudrate")
+
+            self._set_serial_baudrate(self._BAUDRATE_LIST[baudrate_selected-1])
+        
         except Exception:
             print("Port Config Error")
             print("close the program")
             exit()
 
-        """
+        
 
 
     
@@ -110,7 +105,9 @@ class Serial_AT(ICMD):
             if str(line).count(expected_response) >0:    ## the response contain the excepted response
                 ok = True
                 break
-        return ok
+        return ok,buffer_rx    # if state is True then buffer is valid
+
+
 
 
     def _send_cmd(self,cmd,timeout=1):
@@ -142,6 +139,8 @@ class Serial_AT(ICMD):
             self._debug_print("device not respond",device_name=self._device_name)
         
       
+
+
 
     
     def _send_cmd_list(self,*arg,timeout=1):
@@ -264,7 +263,7 @@ if __name__ == "__main__":
 
     print("init program")
     s = Serial_AT()
-    res = s._send_cmd_and_check("z","OK",1)
+    res = s._send_cmd_and_check("","OK",1)
 
     if res == True:
         print("expected response")
