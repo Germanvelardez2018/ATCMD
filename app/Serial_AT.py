@@ -109,6 +109,39 @@ class Serial_AT(ICMD):
 
 
 
+    def _send_buffer_raw(self,buffer,timeout=1):
+        """
+        Send a buffer  command by the interface and return buffer_rx
+        """
+        commands =  buffer 
+        
+
+        try:
+            with serial.Serial(self._port,self._baudrate,timeout=1) as s:
+                s.flushOutput()
+                s.flushOutput()
+                w = s.write(bytes(commands))
+                self._debug_print(commands,device_name=self._device_name)
+
+                
+                lines = s.readlines()
+                for line in lines :
+                    line_formated = (str(line).replace("b",""))
+                    self._debug_print(line_formated,output=False,device_name=self._device_name)
+                    rx_buffer.append(line_formated) 
+
+        except SerialException:
+            self._debug_print("Serial Interface Error",device_name=self._device_name)
+        except SerialTimeoutException:
+            self._debug_print("device not respond",device_name=self._device_name)
+
+       
+
+        
+
+
+
+
 
     def _send_cmd(self,cmd,timeout=1):
         """
@@ -116,7 +149,7 @@ class Serial_AT(ICMD):
         """
         commands = self._PRE_CMD + cmd + self._POS_CMD
 
-
+        rx_buffer=[]
         try:
             with serial.Serial(self._port,self._baudrate,timeout=1) as s:
                 s.flushOutput()
@@ -124,21 +157,22 @@ class Serial_AT(ICMD):
                 w = s.write(bytes(commands,"utf-8"))
                 self._debug_print(commands,device_name=self._device_name)
 
-                rx_buffer=[]
+                
                 lines = s.readlines()
                 for line in lines :
                     line_formated = (str(line).replace("b",""))
                     self._debug_print(line_formated,output=False,device_name=self._device_name)
                     rx_buffer.append(line_formated) 
 
-            return rx_buffer # return all buffer rx
+           
 
         except SerialException:
             self._debug_print("Serial Interface Error",device_name=self._device_name)
         except SerialTimeoutException:
             self._debug_print("device not respond",device_name=self._device_name)
         
-      
+        return rx_buffer # return all buffer rx
+
 
 
 
