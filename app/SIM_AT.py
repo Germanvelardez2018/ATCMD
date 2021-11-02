@@ -8,8 +8,7 @@ import time
 from Serial_AT import Serial_AT
 from SIM7000_CMDS import *
 
-
-
+from credentials import credentials as DATA    #CLASS WITH DATA NOT PUBLIC
 
 
 
@@ -26,60 +25,43 @@ class SIM_AT(Serial_AT):
         super().__init__(pre_cmd,pos_cmd)
 
 
-
-
-
-
     #COMMADS
-
 
     def is_SIM_ready(self):
         """
-        check if the device is ready to receive commands
-        
+        check if the device is ready to receive commands        
         """
         state,buff =  self._send_cmd_and_check(CMD_READY,IS_OK)
         return state
 
 
     def set_echo(self,value):
-
         """
         Turn echo on or off
         """
-
         echo = bool(value)
-
         if echo == True:
             cmd = CMD_ECHO_ON
         else:
             cmd = CMD_ECHO_OFF
-
-        
         s,buff = self._send_cmd_and_check(cmd,IS_OK)
         while s == False:
             time.sleep(1)
-            s = self._send_cmd_and_check(cmd,IS_OK)
+            s,buff = self._send_cmd_and_check(cmd,IS_OK)
 
         
 
 
 
     def set_error_coding(self,value):
-
         """
         Turn error code on or off
         """
-
         cmd = bool(value)
-
         if cmd == True:
             cmd = CMD_SET_ERROR_CODE.format(1)
-
         else:
             cmd = CMD_SET_ERROR_CODE.format(0)
-
-        
         s,buff = self._send_cmd_and_check(cmd,IS_OK)
         while s == False:
             time.sleep(1)
@@ -115,13 +97,13 @@ class SIM_AT(Serial_AT):
                 pos = str(buffer[index]).find("+CSQ: ")
 
                 if pos >= 0:   # pos == -1 when find failed
-                   substring = str(buffer[index][(pos+5):(pos+10)]).replace(",",".")
-                   try:
-                       number = float(substring)
-                       print( "substring is {}".format(substring))
-
-                   except Exception:
-                       pass
+                    if pos != -1:
+                        substring = str(buffer[index][(pos+5):(pos+10)]).replace(",",".")
+                        try:
+                            number = float(substring)
+                            print( "substring is {}".format(substring))
+                        except Exception:
+                            pass
             return number
             #__________________________
         state,buffer = self._send_cmd_and_check(CMD_GET_SIGNAL,IS_OK)
@@ -129,7 +111,7 @@ class SIM_AT(Serial_AT):
         if state == True:
 
             n = get_signal_in_number(buffer)
-            print("la señal del dispostivo es: {}".format(n))
+            #print("signal level: {}".format(n))
 
         return n
 
@@ -142,7 +124,6 @@ class SIM_AT(Serial_AT):
         """
         Get the cellphone operator.     
         """
-
         state,buffer = self._send_cmd_and_check(CMD_SET_OPERATOR.format(0),IS_OK,timeout=5)
         time.sleep(1)
         state,buffer = self._send_cmd_and_check(CMD_GET_OPERATOR,"OK")
@@ -154,6 +135,9 @@ class SIM_AT(Serial_AT):
 
 
     def send_sms(self,number,message="test message"):
+        """"
+        Send a sms to the cellpohne number. Remember that this could have a cost
+        """
         #Active the message function
         self._send_cmd(CMD_SMS_SET_FUNCTION)
         time.sleep(1)
@@ -164,6 +148,73 @@ class SIM_AT(Serial_AT):
         buff_hex = [26,] # you need to send this character to end the message and send
         self._send_buffer_raw(buff_hex,2)
 
+
+    def _open_APN_services(self):
+        """
+        SET APN and get data services
+        """
+        #set APN of your cellpone operator. In my case is Personal Argentina
+        self._send_cmd(CMD_OPEN_CONN.format(APN_PERSONAL))
+        self._send_cmd(CMD_GET_CONN,"OK")
+
+    def mqtt_close(self):
+        self._send_cmd(CMD_DISCONECT_MQTT)
+        self._send_cmd(CMD_CLOSE_MQTT_CONN)
+
+
+    
+
+    #mqtt things
+    def mqtt_init(self,url,user,password,try_again = True):
+        """
+        Configure mqtt services
+        """
+        
+        #DEFAULT CONFIG
+        self._send_cmd(CMD_DEFAULT_CONFIG)
+        time.sleep(1)
+        #init
+        self._open_APN_services()
+        #close
+
+        URL  = CMD_MQTT_SET_URL.format(url)
+        USER = CMD_MQTT_SET_USERNAME.format(user)
+        PASSWORD = CMD_MQTT_SET_PASSWORD.format(password)
+        self._send_cmd(URL)
+        self._send_cmd(USER)
+        self._send_cmd(PASSWORD)
+        self._send_cmd(CMD_MQTT_CHECKS_PARAMS)
+ 
+
+
+
+    def mqtt_publish(self,topic,message):
+        """
+        Pubish a message in the topic
+        """
+        PUB = CMD_MQTT_PUBLISH.format(topic,len(message))
+        self._send_cmd(PUB)
+        self._send_cmd(message)
+
+
+    def mqtt_subscribe(self,topic):
+        """
+        Subscribe to the topic
+        """
+        TOPIC = CMD_MQTT_SUBSCRIBE.format(topic)
+        self._send_cmd(TOPIC)
+
+
+    def mqtt_unsubscribe(self,topic):
+        """
+        Unsubscribe to the topic
+        """
+        TOPIC = CMD_MQTT_UNSUBSCRIBE.format(topic)
+        self._send_cmd(TOPIC)
+
+
+
+       
 # test 
 
 
@@ -190,18 +241,30 @@ if __name__ == "__main__":
     else:
         print("CELLPONE OPERATOR READY")
         print("Send a message")
-        device.send_sms(3856870066,"hello world")
+       # device.send_sms(xxxxxxx,"this a message  from SIM7000G")
 
-   # device.set_error_coding(1)
+    
 
-   # device.is_SIM_ready()
+  
+    print("MQTT TEST")
+    device.set_error_coding(1)
+    device.mqtt_init(DATA.URL,DATA.ID,DATA.PASS)
+    device.mqtt_subscribe(DATA.TOPIC)
 
-   # device.is_SIM_ready()
 
-   # device.is_SIM_ready()
+    number = 1234
 
-   # device.set_echo(True)
-   # device.is_SIM_ready()
+    while number <= 1250:
+        time.sleep(8)
+        device.mqtt_publish(DATA.TOPIC,"count: {}".format(number))
+        print("count: {}".format(number))
+        number +=1
+    
+    device.mqtt_close()
+
+
+
+
 
    
 

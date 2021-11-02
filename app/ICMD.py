@@ -25,6 +25,9 @@ class ICMD(ABC):
             self._PRE_CMD = pre
 
     def set_pos_cmd(self,pos):
+        """
+        Set pos commands
+        """
         if type(pos) == str:
             self._POS_CMD = pos
 
@@ -36,27 +39,40 @@ class ICMD(ABC):
         return self._POS_CMD
 
     def set_debug(self,debug):
+        """
+        Set debug flag
+        """
         self.debug = bool(debug) 
 
     @abstractclassmethod
     def init_interface(self,*arg):
+        """
+        Init the interface
+        """
         pass
 
 
     @abstractclassmethod
     def _send_cmd(self,cmd,timeout):
+        """
+        Send a command and wait a response
+        """
         pass
 
 
     @abstractclassmethod
     def _send_cmd_list(*arg):
+        """"
+        Send a list of commands
+        """
         pass
     
 
-    @abstractclassmethod
-    def _debug_print(self,message):
-        pass
+
 
     @abstractclassmethod
     def _debug_print(self,message,output=True,device_name=""):
+        """
+        print with device data asociated
+        """
         pass

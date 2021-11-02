@@ -114,6 +114,7 @@ APN_USER_PASS_TUENTI = "internet"
 
 
 
+
 CMD_SIM_REGS = "AT+CREG" +ACT_GET   #[ (0,0) (0,1) , (0,2) , (0,3)] = > [not registerd, registered, searching operator,register denid]
 
 CMD_DEFAULT_CONFIG = "ATZ"     #Return to default configuration 
@@ -127,13 +128,8 @@ CMD_SMS_CLEAR_FUNCTION= CMD_SMS_FUNCTION + "=0"  # Format PDU
 
 CMD_SEND_MSM     ='AT+CMGS= "{}"'
 CMD_ASK_BAUDRATE  =  CMD_BAUDRATE +  ACT_ASK
-
-
-
 CMD_READ_IMEI   = "AT+CGSN"
-
 CMD_IS_CHIP_READY = "AT+CPIN?"
-
 CMD_GET_IP        = "AT+CIFSR"    # GET IP
 
 
@@ -146,6 +142,9 @@ CMD_DATA_SERVICE = " AT+CGATT"    #1 CONNECTED , 0 DISCONECTES. FUNCTION ALLOWS 
 
 
 CMD_SET_APN = "AT+CSTT=\"{}\",\"{}\""
+
+
+
 
 
 #mqtt thhings
@@ -164,12 +163,15 @@ CMD_MQTT_SET_KEEPTIME= CMD_PARAM_MQTT+  '="KEEPATIME",{}'
 CMD_MQTT_SET_USERNAME = CMD_PARAM_MQTT+ '=USERNAME,"{}"'
 CMD_MQTT_SET_PASSWORD = CMD_PARAM_MQTT+ '=PASSWORD,"{}"'
 CMD_MQTT_SET_QOS =  CMD_PARAM_MQTT+ '=QOS,{}'   # VALID VALUES 1,2,3 (NUMBERS)
-CMD_MQTT_SUBSCRIBE = 'AT+SMSUB?"{}",1,1'  # ADD TOPICS
+CMD_MQTT_SUBSCRIBE = 'AT+SMSUB="{}",1'  # ADD TOPICS
 CMD_MQTT_UNSUBSCRIBE = 'AT+SMUNSUB="{}'
 
 CMD_MQTT_CHECKS_PARAMS = "AT+SMCONN"
 
 CMD_MQTT_PUBLISH= 'AT+SMPUB="{}","{}",1,1' # PARAMS 1TOPIC, 2LENMESSAGE
+
+
+
 #HTTP(S) THINGS
 """
 Error Codes
@@ -183,16 +185,6 @@ CMD_HTTP_INIT = "AT+HTTPINIT"
 CMD_HTTP_END = "AT+HTTPTERM"
 
 
-#set mode
-CMD_SET_MODE = "AT+CNMP=" # MODES : 2 AUTOMATIC, 13 GSM ONLU, 38 LTE ONLY, 51 GSM AND LTE
-
-CMD_SET_MODE_NB     = "AT+CNMP=38"
-CMD_SET_MODE_NB_2   = "AT+CMNB=2"
-
-CMD_SET_MODE_GPRS   = "AT+CNMP=13"
-CMD_SET_MODE_GRPS_2 = "AT+CMNB=3" # 1 CAT-M , 2 NB-IOT, 3 BOTH
-
-
 
 
 
@@ -200,32 +192,8 @@ CMD_SET_MODE_GRPS_2 = "AT+CMNB=3" # 1 CAT-M , 2 NB-IOT, 3 BOTH
 
 
 """"
-Secuencia de pasos para iniciar una coneccion http
-"AT+CNMP=38"
-"AT+CMNB=2"
-attachtService
------------------
-AT+CGATT=1
-AT+CSTT = MODE
-AT+CIICR
-AT+CIFSR
-------------------
-HTTP_INIT
----------------
-"AT+SAPBR=3,1,"APN","CTNB"   # TO CHANGE CTNB for CMNET
-AT+SAPBR=1,1
-AT+SAPBR=2,1
--------------
-"""
-
-
-
-
-
-
-
-""""
-Error	Description
+Error Codes 	Description
+----------------------------------------------
 CME ERROR: 0	Phone failure
 CME ERROR: 1	No connection to phone
 CME ERROR: 2	Phone adapter link reserved
