@@ -9,14 +9,35 @@ from Serial_AT import Serial_AT
 from SIM7000_CMDS import *
 
 from credentials import credentials as DATA    #CLASS WITH DATA NOT PUBLIC
-
+import json
 
 
 MIN_SIGNAL = 20
 
 MAX_SIGNAL = 33 # WHEN THE DEVICE NOT SIGNAL,RETURN 99.99
 
-
+DATA_FIELD_NMEA = [         "status"
+                          , "fix status"
+                          , "date and time"
+                          , "Latitude"
+                          , "Longitud"
+                          , "Altitude"
+                          , "Speed over ground"
+                          , "Course over Ground"
+                          , "Fix mode"
+                          , "Reserverd1"
+                          , "HDOP"
+                          , "PDOP"
+                          , "Reserved2"
+                          , "GNSS satellites in View"
+                          , "GNSS Satellites used"
+                          , "Reserved3"
+                          , "c/no max"
+                          , "HPA"
+                          , "VPA"
+                          , "x"
+                         
+                          ]
 
 
 
@@ -75,7 +96,7 @@ class SIM_AT(Serial_AT):
         """
         get signal level
         """
-        #____________________________________________________________________
+        #-------------------------inner function start----------------------
         def get_signal_in_number(buffer):
             """
             return signal in float
@@ -105,7 +126,7 @@ class SIM_AT(Serial_AT):
                         except Exception:
                             pass
             return number
-            #__________________________
+        #----------------inner function end-------------------------------------
         state,buffer = self._send_cmd_and_check(CMD_GET_SIGNAL,IS_OK)
 
         if state == True:
@@ -213,57 +234,55 @@ class SIM_AT(Serial_AT):
         self._send_cmd(TOPIC)
 
 
+    def set_gnss(self,value):
+
+        if value == True:
+            cmd = CMD_PWR_GPS.format(1)
+        else:
+            cmd = CMD_PWR_GPS.format(0)
+        
+        self._send_cmd(cmd)
+
+
+
+
+
+
+
+    def get_position(self):
+        """
+        return json with data from gnss. 
+        Before call this function you have to call set_gnss(1) to init the gnss
+         """
+        #---------inner function start------------------------------------
+        def nmea_format(nmea,size = 8):  
+                """
+                NMEA has 21 field but i use size = 8 because. Return json with data
+                """
+                frame = dict()
+                
+                for i in range(size): # len(nmea) - 1 because the last element is \r\n
+                    #print("{}) {}: {}".format(i,DATA_FIELD_NMEA[i],nmea[i]))
+                    frame[DATA_FIELD_NMEA[i]]=nmea[i]
+
+                    data = json.dumps(frame)
+
+                return data
+        #-------------------inner function end-------------------      
+        #GNSS GET
+        state,buffer = self._send_cmd_and_check(CMD_GET_INFO_GPS,"OK")
+            
+        if state == True:
+            for line in buffer:
+                if str(line).count("+CGNSINF:") == 1: #filter the data buffer
+                    data = str(line).split(",")
+                    #print("send {} to nmea_format()".format(data))
+                    data_json = nmea_format(data)
+            
+        return  data_json
+
 
        
-# test 
-
-
-if __name__ == "__main__":
-
-    print ("Class SIM_AT (sim7000g")
-    device = SIM_AT("SIM 7000")
-    device.set_echo(False)
-
-
-    s = device.is_SIM_ready()
-
-    while s ==False:
-        s = device.is_SIM_ready()
-        print("waiting...")
-
-   
-  
-    print("PHONE OPERATOR READY")
-    signal_level = device.get_signal()
-   
-    if signal_level == 0 or signal_level >=40.0:  #when deade phone signal return 99.99
-        print("WITHOUT SIGNAL CELLPHONE")
-    else:
-        print("CELLPONE OPERATOR READY")
-        print("Send a message")
-       # device.send_sms(xxxxxxx,"this a message  from SIM7000G")
-
-    
-
-  
-    print("MQTT TEST")
-    device.set_error_coding(1)
-    device.mqtt_init(DATA.URL,DATA.ID,DATA.PASS)
-    device.mqtt_subscribe(DATA.TOPIC)
-
-
-    number = 1234
-
-    while number <= 1250:
-        time.sleep(8)
-        device.mqtt_publish(DATA.TOPIC,"count: {}".format(number))
-        print("count: {}".format(number))
-        number +=1
-    
-    device.mqtt_close()
-
-
-
 
 
    

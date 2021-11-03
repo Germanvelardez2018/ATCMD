@@ -42,16 +42,19 @@ def main():
     device.mqtt_subscribe(DATA.TOPIC)
 
 
-    number = 1234
-
-    while number <= 1250:
-        time.sleep(8)
-        device.mqtt_publish(DATA.TOPIC,"count: {}".format(number))
-        print("count: {}".format(number))
-        number +=1
-    
+    number = 0
+    device.set_gnss(1)
+    time.sleep(30)
+    while number <= 10:
+       time.sleep(30)
+       data =device.get_position()
+       print("send data: {}".format(data))
+       device.mqtt_publish(DATA.TOPIC,"GNSS:{}".format(data))
+       number += 1
+       
+    print("fin")
+    device.set_gnss(0)
     device.mqtt_close()
-
 
 
 

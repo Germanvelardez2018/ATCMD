@@ -61,14 +61,103 @@ CMD_SET_OPERATOR = CMD_OPERATOR+ACT_SET+ "{}"
 #GPS 
 
 
-CMD_PWR_GPS = "AT+CFNSPWR" # =0 OFF ,=1 ON
+CMD_PWR_GPS = "AT+CGNSPWR={}" # =0 OFF ,=1 ON
 CMD_GET_INFO_GPS = "AT+CGNSINF"
 CMD_SET_PORT_GPS = "AT+CGNSPORT"   # 3 NMEA PORT, 4 NONE
 
 
+""""
+format gps information
+
+
+Response
++CGNSINF: <GNSS run status>,<Fix status>,<UTC date &
+Time>,<Latitude>,<Longitude>,<MSL Altitude>,<Speed Over
+Ground>,<Course Over Ground>,<Fix
+Mode>,<Reserved1>,<HDOP>,<PDOP>,<VDOP>,<Reserved2>,<GNSS
+Satellites in View>,<GNSS Satellites Used>,<GLONASS Satellites
+Used>,<Reserved3>,<C/N0 max>,<HPA>,<VPA>
+
+example:
++CGNSINF: 1,1,20211103131011.000,-27.799629,-64.250056,171.100,0.00,20.3,1,,1.3,1.6,1.0,,12,3,,,34,,␍␊
+
+---
+len = 1
+GNSS run status[VALUES] :
+    0 GNSS OFF
+    1 GNSS ON
+---
+len = 1
+FIX STATUS[VALUES]:
+    0 NOT FIXED
+    1 FIXED POSITION
+---
+len = 18
+UTC date & time[FORMAT]:
+yyyyMMddhhmmss.sss
+example: 20211103131011.000 
+        -> yyyy= 2021
+        -> MM = 11
+        -> dd = 03
+        -->hh = 13
+        -> mm = 10
+        -> ss.sss = 11.000
+
+---
+len =10
+Latitude[Format]:
+±dd.dddddd
+example: -27.799629
+
+---
+len = 11
+Longitud[Format]:
+±ddd.dddddd
+example: -64.250056
+---
+len= 8 
+Altitude[Format]:
+example: 171.100 [m]
+---
+len= 6
+Speed over ground[Format]
+
+example:0.00[Km/h]
+---
+len 06
+Course over ground[Format]
+example: 20.3 [degres]
+---
+len= 1
+Fix mode[values]:
+    0,
+    1,
+    2
+
+"""
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+""""
+ Author: German Velardez
+ email: germanvelardez16@gmail.com
+ 
+ description: Commands for SIM7000G
+"""
 
 
 
@@ -89,12 +178,6 @@ CMD_SMS_CLEAR_FUNCTION= CMD_SMS_FUNCTION + "=0"  # Format PDU
 
 
 
-""""
- Author: German Velardez
- email: germanvelardez16@gmail.com
- 
- description: Commands for SIM7000G
-"""
 
 
 

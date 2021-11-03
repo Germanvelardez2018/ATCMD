@@ -123,7 +123,7 @@ class Serial_AT(ICMD):
                 w = s.write(bytes(commands))
                 self._debug_print(commands,device_name=self._device_name)
 
-                
+                rx_buffer = []
                 lines = s.readlines()
                 for line in lines :
                     line_formated = (str(line).replace("b",""))
