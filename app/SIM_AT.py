@@ -8,7 +8,7 @@ import time
 from Serial_AT import Serial_AT
 from SIM7000_CMDS import *
 
-from credentials import credentials as DATA    #CLASS WITH DATA NOT PUBLIC
+from credentials import Credentials as DATA    #CLASS WITH DATA NOT PUBLIC
 import json
 
 

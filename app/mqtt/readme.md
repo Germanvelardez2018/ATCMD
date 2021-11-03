@@ -14,7 +14,7 @@ Credentials
 
 
 
-class credentials:
+class Credentials:
     TOPIC = "your topic"
     URL="your broker mqtt "
     PORT = 1883
