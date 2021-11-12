@@ -4,11 +4,7 @@ email: germanvelardez16@gmail.com
 date: 29/10/2021
 
 """
-
-
-from ICMD import ICMD
-
-
+from Serial_interface.ICMD import ICMD
 
 from os import write
 import time
@@ -97,6 +93,9 @@ class Serial_AT(ICMD):
 
     
     def _send_cmd_and_check(self,cmd,expected_response,timeout=1):
+        """
+        Send a command and check expected response
+        """
 
         buffer_rx = self._send_cmd(cmd,timeout=timeout)
 

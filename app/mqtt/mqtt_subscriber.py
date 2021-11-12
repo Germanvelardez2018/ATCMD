@@ -1,6 +1,6 @@
 import paho.mqtt.client as mqtt
 import time
-from credentials import Credentials as  DATA
+from Credentials import credentials as  DATA
 
 
 

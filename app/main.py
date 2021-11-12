@@ -6,7 +6,7 @@ date: 29/10/2021
 """
 import time
 from SIM_AT import SIM_AT
-from credentials import credentials as DATA
+from credentials import Credentials as DATA  # REMENBER CREATE your own credential.py
 
 def main():
 

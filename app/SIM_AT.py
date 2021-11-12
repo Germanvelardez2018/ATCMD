@@ -5,10 +5,10 @@ Interface for SIM devices
 """
 
 import time
-from Serial_AT import Serial_AT
+from Serial_interface.Serial_AT import Serial_AT
 from SIM7000_CMDS import *
 
-from credentials import Credentials as DATA    #CLASS WITH DATA NOT PUBLIC
+
 import json
 
 

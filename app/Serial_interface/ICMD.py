@@ -9,7 +9,13 @@ date: 29/10/2021
 from abc import ABC, abstractclassmethod
 
 
+
+
 class ICMD(ABC):
+
+    """
+    INTERFACE COMMAND
+    """
 
     _PRE_CMD = ""
     _POS_CMD = ""
