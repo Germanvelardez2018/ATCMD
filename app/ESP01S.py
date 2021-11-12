@@ -1,0 +1,66 @@
+""""
+Command list of ESP01 ()
+https://docs.espressif.com/projects/esp-at/en/release-v2.2.0.0_esp8266/AT_Command_Set/index.html
+"""
+
+
+# is ready?
+
+ESP01_IS_READY = "AT"
+
+#GET VERSION
+ESP01_GET_VERSION = "AT+GMR"
+
+# SET ECHO
+
+ESP01_SET_ECCHO = "ATE{}" # 0/1
+
+
+ESP01_RESTORE = "AT+RESTORE"
+
+
+
+#ENTER DEEP SLEEP
+
+ESP01_SET_DEEP_SLEEP = "AT+GSLP={}"  # SET TIME IN MS
+
+ESP_WIFI_CONFIG_NOT_SAVE= "AT+CWJAP_CUR"
+
+
+#CONFIGURE AND NOT SAVE WIFI DATA
+
+ESP_GET_WIFI_CONFIG =ESP_WIFI_CONFIG_NOT_SAVE + "?"
+ESP01_SET_WIFI_AP_VOLATILE = ESP_WIFI_CONFIG_NOT_SAVE+'="{}","{}"' #WIFI ID AND PASSWORD
+
+
+#CONFIGURE AND SAVE WIFI DATA
+
+ESP01_WIFI_CONFIG = "AT+CWJAP_DEF"
+
+ESP01_SET_WIFI = ESP01_WIFI_CONFIG + '= "{}',"{}"   #WIFI ID AND PASSWORD
+
+
+ESP01_DISCONECT_WIFI = "AT+CWQAP"
+
+
+ESP01_GET_WIFI_LIST = "AT+CWLAP"
+
+ESP01_CHECK_IP = "AT+CIFSR"
+
+
+
+
+
+
+"""
+firmware update with esptool. For ESP-01S
+
+https://github.com/espressif/ESP8266_NONOS_SDK/commit/14799b04ec0e76e15704fe4af08273afc53641e7
+addres:
+0xFB000 blank
+0x7E000 blank
+0xFC000 default
+0x00000 boot
+0x01000 user1.1024.new.2
+"""
+
