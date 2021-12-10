@@ -1,25 +1,3 @@
-# This is a simple mqtt client to subscribe and test your module SIM. You need generate a credentials.py file
-# with this content 
+# This is a simple mqtt client to subscribe and test your module SIM. You need generate a credentials to use a mqtt broker
 
-
-
-
-```
-
-
-"""
-
-Credentials
-"""
-
-
-
-class Credentials:
-    TOPIC = "your topic"
-    URL="your broker mqtt "
-    PORT = 1883
-    ID = "your id"
-    PASS ="your password"
-
-    
 
